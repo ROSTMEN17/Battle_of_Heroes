@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 // Enum ��� ���� �����
 var HeroType;
 (function (HeroType) {
@@ -27,7 +36,7 @@ function createHero(name, type) {
         attackType: type === HeroType.Warrior ? AttackType.Physical
             : type === HeroType.Mage ? AttackType.Magical
                 : AttackType.Ranged,
-        stats: baseStats[type],
+        stats: Object.assign({}, baseStats[type]),
         isAlive: true,
     };
 }
@@ -50,7 +59,7 @@ function findHeroByProperty(heroes, property, value) {
 // ������� ���������� ������ ��� �� �������
 function battleRound(hero1, hero2) {
     if (!hero1.isAlive || !hero2.isAlive) {
-        return "���� �� ����� ��� �������. ��� ����������.";
+        return "One of the heroes has already died. The battle is impossible.";
     }
     const attacker = hero1.stats.speed >= hero2.stats.speed ? hero1 : hero2;
     const defender = attacker === hero1 ? hero2 : hero1;
@@ -58,26 +67,39 @@ function battleRound(hero1, hero2) {
     defender.stats.health = attackResult.remainingHealth;
     if (defender.stats.health === 0) {
         defender.isAlive = false;
-        return `${attacker.name} ������ ${defender.name}, �������� ${attackResult.damage} ����������!`;
+        return `${attacker.name} won ${defender.name}, inflicting ${attackResult.damage} damages!`;
     }
-    return `${attacker.name} �������� ${defender.name}, �������� ${attackResult.damage} ����������. � ${defender.name} ���������� ${defender.stats.health} ������'�.`;
+    return `${attacker.name} attacked ${defender.name}, inflicting ${attackResult.damage} damages.  ${defender.name} is left. ${defender.stats.health} health.`;
+}
+// ������� ��� ��� �� ���� �������
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+function playGame(heroes) {
+    return __awaiter(this, void 0, void 0, function* () {
+        while (heroes.filter(hero => hero.isAlive).length > 1) {
+            const aliveHeroes = heroes.filter(hero => hero.isAlive);
+            const hero1 = aliveHeroes[Math.floor(Math.random() * aliveHeroes.length)];
+            let hero2;
+            do {
+                hero2 = aliveHeroes[Math.floor(Math.random() * aliveHeroes.length)];
+            } while (hero1 === hero2);
+            console.log(battleRound(hero1, hero2));
+            yield delay(1000); // �������� 1 ������� �� ��������
+        }
+        const winner = heroes.find(hero => hero.isAlive);
+        console.log(winner ? '${ winner.name } is the last hero and has won the game!' : "All the heroes were killed.");
+    });
 }
 // ��������� ������������
 const heroes = [
-    createHero("������", HeroType.Warrior),
-    createHero("�����", HeroType.Mage),
-    createHero("����", HeroType.Archer),
+    createHero("Dmitry", HeroType.Warrior),
+    createHero("Merlin", HeroType.Mage),
+    createHero("Robin.", HeroType.Archer),
 ];
-// ������������ ������
-console.log("����:", heroes);
-// ����� ����� �� �����
-const foundHero = findHeroByProperty(heroes, "type", HeroType.Mage);
-console.log("��������� �����:", foundHero);
-// ���������� ��� �� �������
-const result1 = battleRound(heroes[0], heroes[1]);
-console.log(result1);
-const result2 = battleRound(heroes[0], heroes[2]);
-console.log(result2);
+// ������� ���
+console.log("Heroes:", heroes);
+playGame(heroes);
 // �������� ��������� ���� �����
-console.log("���� ����� ���� ���:", heroes);
+console.log("The state of the characters after the game:", heroes);
 //# sourceMappingURL=app.js.map

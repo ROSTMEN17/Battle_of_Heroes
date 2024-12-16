@@ -1,3 +1,6 @@
 C:\Users\Admin\source\repos\Game\Game\obj\Debug\Game.njsproj.AssemblyReference.cache
 C:\Users\Admin\source\repos\Game\Game\obj\Debug\Game.njsproj.CoreCompileInputs.cache
 C:\Users\Admin\source\repos\Game\Game\bin\Microsoft.NodejsTools.WebRole.dll
+C:\Users\Admin\source\repos\Game\Battle_of_Heroes\Game\obj\Debug\Game.njsproj.AssemblyReference.cache
+C:\Users\Admin\source\repos\Game\Battle_of_Heroes\Game\obj\Debug\Game.njsproj.CoreCompileInputs.cache
+C:\Users\Admin\source\repos\Game\Battle_of_Heroes\Game\bin\Microsoft.NodejsTools.WebRole.dll

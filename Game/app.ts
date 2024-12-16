@@ -54,7 +54,7 @@ function createHero(name: string, type: HeroType): Hero {
         attackType: type === HeroType.Warrior ? AttackType.Physical
             : type === HeroType.Mage ? AttackType.Magical
                 : AttackType.Ranged,
-        stats: baseStats[type],
+        stats: { ...baseStats[type] },
         isAlive: true,
     };
 }
@@ -85,7 +85,7 @@ function findHeroByProperty<T extends keyof Hero>(
 // Функція проведення раунду бою між героями
 function battleRound(hero1: Hero, hero2: Hero): string {
     if (!hero1.isAlive || !hero2.isAlive) {
-        return "Один із героїв вже загинув. Бій неможливий.";
+        return "One of the heroes has already died. The battle is impossible.";
     }
 
     const attacker = hero1.stats.speed >= hero2.stats.speed ? hero1 : hero2;
@@ -96,32 +96,44 @@ function battleRound(hero1: Hero, hero2: Hero): string {
 
     if (defender.stats.health === 0) {
         defender.isAlive = false;
-        return `${attacker.name} переміг ${defender.name}, завдавши ${attackResult.damage} пошкоджень!`;
+        return `${attacker.name} won ${defender.name}, inflicting ${attackResult.damage} damages!`;
     }
 
-    return `${attacker.name} атакував ${defender.name}, завдавши ${attackResult.damage} пошкоджень. У ${defender.name} залишилось ${defender.stats.health} здоров'я.`;
+    return `${attacker.name} attacked ${defender.name}, inflicting ${attackResult.damage} damages.  ${defender.name} is left. ${defender.stats.health} health.`;
+}
+
+// Функція для гри між усіма героями
+function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function playGame(heroes: Hero[]): Promise<void> {
+    while (heroes.filter(hero => hero.isAlive).length > 1) {
+        const aliveHeroes = heroes.filter(hero => hero.isAlive);
+        const hero1 = aliveHeroes[Math.floor(Math.random() * aliveHeroes.length)];
+        let hero2: Hero;
+        do {
+            hero2 = aliveHeroes[Math.floor(Math.random() * aliveHeroes.length)];
+        } while (hero1 === hero2);
+
+        console.log(battleRound(hero1, hero2));
+        await delay(1000); // Затримка 1 секунда між раундами
+    }
+
+    const winner = heroes.find(hero => hero.isAlive);
+    console.log(winner ? '${ winner.name } is the last hero and has won the game!' : "All the heroes were killed.");
 }
 
 // Практичне застосування
 const heroes: Hero[] = [
-    createHero("Дмитро", HeroType.Warrior),
-    createHero("Мерлін", HeroType.Mage),
-    createHero("Робін", HeroType.Archer),
+    createHero("Dmitry", HeroType.Warrior),
+    createHero("Merlin", HeroType.Mage),
+    createHero("Robin.", HeroType.Archer),
 ];
 
-// Демонстрація роботи
-console.log("Герої:", heroes);
-
-// Пошук героя за типом
-const foundHero = findHeroByProperty(heroes, "type", HeroType.Mage);
-console.log("Знайдений герой:", foundHero);
-
-// Проведення бою між героями
-const result1 = battleRound(heroes[0], heroes[1]);
-console.log(result1);
-
-const result2 = battleRound(heroes[0], heroes[2]);
-console.log(result2);
+// Початок гри
+console.log("Heroes:", heroes);
+playGame(heroes);
 
 // Показати фінальний стан героїв
-console.log("Стан героїв після бою:", heroes);
+console.log("The state of the characters after the game:", heroes);
